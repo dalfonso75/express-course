@@ -1,66 +1,60 @@
 const express = require('express');
-const faker = require('faker');
+
+const ProductsService = require('../services/product.service');
 
 const router = express.Router();
+const service = new ProductsService();
 
-router.get('/', (req, res) => {
-  const products = [];
-  const { size } = req.query;
-  const limit = size || 10;
-  for (let index = 0; index < limit; index++) {
-    products.push({
-      id: index,
-      name: faker.commerce.productName(),
-      price: parseInt(faker.commerce.price(), 10),
-      image: faker.image.imageUrl(),
-    })
-  }
+router.get('/', async (req, res) => {
+  const products = await service.find();
   res.json(products);
 });
 
 // los endpoints especificos deben ir antes que los dinamicos.
-router.get('/filter', (req, res) => {
+router.get('/filter', async (req, res) => {
   res.send('Yo soy un filter');
 })
 
-router.get('/:productId', (req, res) => {
+router.get('/:productId', async (req, res, next) => {
   const { productId } = req.params;
-  if (productId === '999') {
-    res.status(404).json({
-      message: "Not Found"
-    })
-  } else {
-    res.status(200).json({
-      productId,
-      name: 'Product 1',
-      price: '1000',
-    });
+  try {
+    const product = await service.findOne(productId);
+    res.json(product);
+  } catch (err) {
+    next(err);
   }
+
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   const body = req.body;
+  const newProduct = await service.create(body);
   res.status(201).json({
     message: "Created",
-    data: body
+    data: newProduct
   })
 })
 
-router.patch("/:productId", (req, res) => {
+router.patch("/:productId", async (req, res, next) => {
   const { productId } = req.params
   const body = req.body;
-  res.json({
-    message: "Update",
-    data: body,
-    productId,
-  })
+  try {
+    const updateProduct = await service.update(productId, body);
+    res.json({
+      message: "Update",
+      data: updateProduct,
+    })
+  } catch (err) {
+    next(err);
+  }
 })
 
-router.delete("/:productId", (req, res) => {
+router.delete("/:productId", async (req, res) => {
   const { productId } = req.params
+  const deleteProductId = await service.delete(productId)
   res.json({
     message: "Delete",
-    productId,
+    deleteProductId,
   })
 })
 
