@@ -13,10 +13,10 @@ const port = 3001;
 app.use(express.json());
 
 
-const whilelist = ['http://locahost:8080', 'http://127.0.0.1:5500', 'http://127.0.0.1:8080'];
+const whilelist = ['http://locahost:8080', 'http://127.0.0.1:5500'];
 const options = {
   origin: (origin, callback) => {
-    if (whilelist.includes(origin)) {
+    if (whilelist.includes(origin) || !origin) {
       callback(null, true);
     } else {
       console.log(origin);
@@ -24,9 +24,7 @@ const options = {
     }
   }
 }
-// app.use(cors(options));
-app.use(cors());
-
+app.use(cors(options));
 app.get('/', (req, res) => {
   res.send('Server in express');
 });
