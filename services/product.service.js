@@ -6,7 +6,9 @@ class ProductsService {
   constructor() { }
 
   async find() {
-    const products = await models.Product.findAll();
+    const products = await models.Product.findAll({
+      include: 'category'
+    });
     return products;
   }
 
@@ -19,8 +21,8 @@ class ProductsService {
   }
 
   async create(data) {
-    const newCategory = await models.Product.create(data);
-    return newCategory;
+    const newProduct = await models.Product.create(data);
+    return newProduct;
   }
 
   async update(id, changes) {

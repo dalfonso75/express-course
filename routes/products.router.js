@@ -11,19 +11,17 @@ const {
   getProductSchema,
 } = require('../schemas/product.shema');
 
-
-
-router.get('/', async (req, res) => {
-  const products = await service.find();
-  res.json(products);
+router.get('/', async (req, res, next) => {
+  try {
+    const products = await service.find();
+    res.json(products);
+  } catch (err) {
+    next(err);
+  }
 });
 
-// los endpoints especificos deben ir antes que los dinamicos.
-router.get('/filter', async (req, res) => {
-  res.send('Yo soy un filter');
-});
-
-router.get('/:id',
+router.get(
+  '/:id',
   validatorHandler(getProductSchema, 'params'),
   async (req, res, next) => {
     const { id } = req.params;
@@ -33,18 +31,23 @@ router.get('/:id',
     } catch (err) {
       next(err);
     }
-  });
+  }
+);
 
 router.post(
   '/',
   validatorHandler(createProductSchema, 'body'),
-  async (req, res) => {
-    const body = req.body;
-    const newProduct = await service.create(body);
-    res.status(201).json({
-      message: 'Created',
-      data: newProduct,
-    });
+  async (req, res, next) => {
+    try {
+      const body = req.body;
+      const newProduct = await service.create(body);
+      res.status(201).json({
+        message: 'Created',
+        data: newProduct,
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 );
 
@@ -53,9 +56,9 @@ router.patch(
   validatorHandler(getProductSchema, 'params'),
   validatorHandler(updateProductSchema, 'body'),
   async (req, res, next) => {
-    const { id } = req.params;
-    const body = req.body;
     try {
+      const { id } = req.params;
+      const body = req.body;
       const updateProduct = await service.update(id, body);
       res.json({
         message: 'Update',
@@ -67,7 +70,8 @@ router.patch(
   }
 );
 
-router.delete('/:id',
+router.delete(
+  '/:id',
   validatorHandler(getProductSchema, 'params'),
   async (req, res) => {
     const { id } = req.params;
@@ -76,6 +80,7 @@ router.delete('/:id',
       message: 'Delete',
       deleteProductId,
     });
-  });
+  }
+);
 
 module.exports = router;
