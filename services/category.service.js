@@ -4,26 +4,34 @@ const { models } = require('../libs/sequelize');
 
 class CategoryService {
   constructor() { }
+
+  async find() {
+    const categories = await models.Category.findAll();
+    return categories;
+  }
+
+  async findOne(id) {
+    const category = await models.Category.findByPk(id);
+    if (!category) {
+      throw boom.notFound('category not found');
+    }
+    return category;
+  }
+
   async create(data) {
     const newCategory = await models.Category.create(data);
     return newCategory;
   }
-  async find() {
-    const rta = true;
-    return rta;
-  }
-  async findOne(id) {
-    const user = id
-    return user;
-  }
+
   async update(id, changes) {
-    const user = id;
-    const rta = id;
-    return rta;
+    const category = await this.findOne(id);
+    const updateCategory = await category.update(changes);
+    return updateCategory;
   }
+
   async delete(id) {
-    // const user = await this.findOne(id);
-    // const rta = await user.destroy();
+    const category = await this.findOne(id);
+    await category.destroy();
     return id;
   }
 }
