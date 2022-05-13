@@ -2,10 +2,13 @@ const boom = require('@hapi/boom');
 
 const { models } = require('../libs/sequelize');
 class CustomerService {
-  constructor() { }
+  constructor() {}
 
   async find() {
-    const rta = await models.Customer.findAll();
+    const rta = await models.Customer.findAll({
+      include: ['user'],
+    });
+
     return rta;
   }
 
@@ -18,11 +21,16 @@ class CustomerService {
   }
 
   async create(data) {
-    const rta = await models.Customer.create(data);
-    // const rta = await models.Customer.findAll({
-    //   include: ['user'],
+    // const newUser = await models.User.create(data.user);
+    // const newCustomer = await models.Customer.create({
+    //   ...data,
+    //   userId: newUser.id,
     // });
-    return rta;
+    // sequelize reconocer la asociacion o relacion entre customer y user
+    const newCustomer = await models.Customer.create(data, {
+      include: ['user'],
+    });
+    return newCustomer;
   }
 
   async update(id, changes) {
