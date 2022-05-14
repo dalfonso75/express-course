@@ -9,6 +9,7 @@ const {
   createOrderSchema,
   updateOrderSchema,
   getOrderSchema,
+  addItemSchema
 } = require('../schemas/order.schema');
 
 router.get('/', async (req, res, next) => {
@@ -80,6 +81,25 @@ router.delete(
       res.json({
         message: 'Delete',
         deleteOrderId,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+// Items
+
+router.post(
+  '/add-item',
+  validatorHandler(addItemSchema, 'body'),
+  async (req, res, next) => {
+    try {
+      const body = req.body;
+      const newItem = await service.addItem(body);
+      res.status(201).json({
+        message: 'Created Item',
+        data: newItem,
       });
     } catch (err) {
       next(err);
