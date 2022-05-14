@@ -1,1 +1,1 @@
-# express-course
+# API REST FULL NODE JS, EXPRESS, SEQUELIZE, JOI
